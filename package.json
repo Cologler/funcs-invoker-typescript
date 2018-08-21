@@ -1,17 +1,24 @@
 {
-  "name": "event-invoker",
-  "version": "0.1.0",
+  "name": "funcs-invoker",
+  "version": "0.2.0",
   "description": "",
-  "main": "./dist/event-invoker.js",
-  "jsdelivr": "./dist/event-invoker.browser.js",
+  "main": "./dist/funcs-invoker.js",
+  "jsdelivr": "./dist/funcs-invoker.browser.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ts-mocha src/**/*.spec.ts",
     "prepare": "tsc",
-    "browserify": "tsc && browserify . -s event-invoker -o dist/event-invoker.browser.js"
+    "browserify": "tsc && browserify . -s funcs-invoker -o dist/funcs-invoker.browser.js"
   },
   "author": "Cologler",
   "license": "MIT",
   "devDependencies": {
-    "browserify": "^16.2.2"
+    "@types/expect": "^1.20.3",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.7.1",
+    "@types/typescript": "^2.0.0",
+    "browserify": "^16.2.2",
+    "mocha": "^5.2.0",
+    "ts-mocha": "^2.0.0",
+    "typescript": "^3.0.1"
   }
 }
