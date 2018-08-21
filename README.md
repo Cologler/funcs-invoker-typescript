@@ -1,5 +1,7 @@
 # funcs-invoker
 
+[![](https://data.jsdelivr.com/v1/package/gh/Cologler/funcs-invoker-typescript/badge)](https://www.jsdelivr.com/package/gh/Cologler/funcs-invoker-typescript)
+
 **WHY** a event emitter need a event name ?!
 
 ``` ts
