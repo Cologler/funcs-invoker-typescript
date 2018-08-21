@@ -25,7 +25,8 @@ interface InvokeContext {
 }
 declare type Func<T extends any[]> = (this: InvokeContext, ...args: T) => any;
 /**
- * allow user invoke multi-function with one times.
+ * a class allow user invoke multi-function with one times.
+ * a little like delegate in csharp.
  *
  * @export
  * @class FuncsInvoker
@@ -101,24 +102,71 @@ export declare class FuncsInvoker<T extends any[]> {
     readonly Count: number;
 }
 declare type EventKey = PropertyKey;
+/**
+ * a simple event emitter base on `FuncsInvokers`.
+ *
+ * @export
+ * @class EventEmitter
+ */
 export declare class EventEmitter {
     private _table;
-    getFuncsInvoker(eventName: EventKey, add: true): FuncsInvoker<any[]>;
-    getFuncsInvoker(eventName: EventKey, add: false): FuncsInvoker<any[]> | null;
+    /**
+     * get the `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} eventName
+     * @param {true} add
+     * @returns {FuncsInvoker<any[]>}
+     * @memberof EventEmitter
+     */
+    private _getFuncsInvoker;
     private _removeFuncsInvoker;
+    private _getFuncsInvokersOptional;
+    /**
+     * add a callback to `FuncsInvoker` by `eventName`
+     *
+     * @param {EventKey} eventName
+     * @param {Func<any[]>} func
+     * @param {boolean} [once=false]
+     * @returns
+     * @memberof EventEmitter
+     */
     on(eventName: EventKey, func: Func<any[]>, once?: boolean): this;
+    /**
+     * remove a callback from `FuncsInvoker` by `eventName`
+     *
+     * @param {EventKey} [eventName] keep empty to remove all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to remove all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
     off(eventName?: EventKey, func?: Func<any[]>): this;
-    disable(eventName: EventKey, func?: Func<any[]>): this;
-    enable(eventName: EventKey, func?: Func<any[]>): this;
+    /**
+     * disable the last matched function from `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} eventName keep empty to disable from all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to disable all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
+    disable(eventName?: EventKey, func?: Func<any[]>): this;
+    /**
+     * enable the last matched function from `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} [eventName] keep empty to enable from all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to enable all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
+    enable(eventName?: EventKey, func?: Func<any[]>): this;
     /**
      *
      *
-     * @param {EventKey} eventName
+     * @param {EventKey} eventName keep empty to emit all.
      * @param {...any[]} args
      * @returns always return `undefined`
      * @memberof EventEmitter
      */
-    emit(eventName: EventKey, ...args: any[]): any;
+    emit(eventName?: EventKey, ...args: any[]): void;
     getEventNames(): (string | number | symbol)[];
 }
 export {};

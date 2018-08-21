@@ -7,7 +7,8 @@
   "scripts": {
     "test": "ts-mocha src/**/*.spec.ts",
     "prepare": "tsc",
-    "browserify": "tsc && browserify . -s funcs-invoker -o dist/funcs-invoker.browser.js"
+    "browserify": "tsc && browserify . -s funcs-invoker -o dist/funcs-invoker.browser.js",
+    "compile": "npm test && npm run browserify"
   },
   "author": "Cologler",
   "license": "MIT",

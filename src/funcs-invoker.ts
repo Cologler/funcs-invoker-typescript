@@ -48,7 +48,8 @@ function findLastIndex<T>(src: Array<T>, condition: (item: T) => boolean) {
 }
 
 /**
- * allow user invoke multi-function with one times.
+ * a class allow user invoke multi-function with one times.
+ * a little like delegate in csharp.
  *
  * @export
  * @class FuncsInvoker
@@ -231,12 +232,26 @@ export class FuncsInvoker<T extends any[]> {
 
 type EventKey = PropertyKey;
 
+/**
+ * a simple event emitter base on `FuncsInvokers`.
+ *
+ * @export
+ * @class EventEmitter
+ */
 export class EventEmitter {
     private _table = new Map<EventKey, FuncsInvoker<any[]>>();
 
-    getFuncsInvoker(eventName: EventKey, add: true): FuncsInvoker<any[]>;
-    getFuncsInvoker(eventName: EventKey, add: false): FuncsInvoker<any[]> | null;
-    getFuncsInvoker(eventName: EventKey, add: boolean): FuncsInvoker<any[]> | null {
+    /**
+     * get the `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} eventName
+     * @param {true} add
+     * @returns {FuncsInvoker<any[]>}
+     * @memberof EventEmitter
+     */
+    private _getFuncsInvoker(eventName: EventKey, add: true): FuncsInvoker<any[]>;
+    private _getFuncsInvoker(eventName: EventKey, add: false): FuncsInvoker<any[]> | null;
+    private _getFuncsInvoker(eventName: EventKey, add: boolean): FuncsInvoker<any[]> | null {
         let ei = this._table.get(eventName) || null;
         if (!ei && add) {
             this._table.set(eventName, ei = new FuncsInvoker());
@@ -248,38 +263,78 @@ export class EventEmitter {
         this._table.delete(eventName);
     }
 
+    private _getFuncsInvokersOptional(eventName?: EventKey) {
+        if (eventName) {
+            const invoker = this._getFuncsInvoker(eventName, false);
+            return invoker ? [invoker] : [];
+        } else {
+            return this._table.values();
+        }
+    }
+
+    /**
+     * add a callback to `FuncsInvoker` by `eventName`
+     *
+     * @param {EventKey} eventName
+     * @param {Func<any[]>} func
+     * @param {boolean} [once=false]
+     * @returns
+     * @memberof EventEmitter
+     */
     on(eventName: EventKey, func: Func<any[]>, once: boolean=false) {
-        this.getFuncsInvoker(eventName, true).on(func, once);
+        this._getFuncsInvoker(eventName, true).on(func, once);
         return this;
     }
 
+    /**
+     * remove a callback from `FuncsInvoker` by `eventName`
+     *
+     * @param {EventKey} [eventName] keep empty to remove all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to remove all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
     off(eventName?: EventKey, func?: Func<any[]>) {
-        if (eventName === undefined) {
-            this._table = new Map();
-        } else {
-            const fi = this.getFuncsInvoker(eventName, false);
-            if (fi) {
-                fi.off(func);
-                if (fi.isEmpty) {
+        if (eventName) {
+            const invoker = this._getFuncsInvoker(eventName, false);
+            if (invoker) {
+                invoker.off(func);
+                if (invoker.isEmpty) {
                     this._removeFuncsInvoker(eventName);
                 }
             }
+        } else {
+            this._table = new Map();
         }
         return this;
     }
 
-    disable(eventName: EventKey, func?: Func<any[]>) {
-        const fi = this.getFuncsInvoker(eventName, false);
-        if (fi) {
-            fi.disable(func);
+    /**
+     * disable the last matched function from `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} eventName keep empty to disable from all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to disable all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
+    disable(eventName?: EventKey, func?: Func<any[]>) {
+        for (const invoker of this._getFuncsInvokersOptional(eventName)) {
+            invoker.disable(func);
         }
         return this;
     }
 
-    enable(eventName: EventKey, func?: Func<any[]>) {
-        const fi = this.getFuncsInvoker(eventName, false);
-        if (fi) {
-            fi.enable(func);
+    /**
+     * enable the last matched function from `FuncsInvoker` by `eventName`.
+     *
+     * @param {EventKey} [eventName] keep empty to enable from all `FuncsInvoker`.
+     * @param {Func<any[]>} [func] keep empty to enable all callbacks from `FuncsInvoker`.
+     * @returns
+     * @memberof EventEmitter
+     */
+    enable(eventName?: EventKey, func?: Func<any[]>) {
+        for (const invoker of this._getFuncsInvokersOptional(eventName)) {
+            invoker.enable(func);
         }
         return this;
     }
@@ -287,21 +342,21 @@ export class EventEmitter {
     /**
      *
      *
-     * @param {EventKey} eventName
+     * @param {EventKey} eventName keep empty to emit all.
      * @param {...any[]} args
      * @returns always return `undefined`
      * @memberof EventEmitter
      */
-    emit(eventName: EventKey, ...args: any[]) {
-        const fi = this.getFuncsInvoker(eventName, false);
-        if (fi) {
-            const ret = fi.invoke(...args);
-            if (fi.isEmpty) {
-                this._removeFuncsInvoker(eventName);
-            }
-            return ret;
+    emit(eventName?: EventKey, ...args: any[]) {
+        for (const invoker of this._getFuncsInvokersOptional(eventName)) {
+            invoker.invoke(...args);
         }
-        return undefined;
+
+        for (const [key, invoker] of Array.from(this._table.entries())) {
+            if (invoker.isEmpty) {
+                this._removeFuncsInvoker(key);
+            }
+        }
     }
 
     getEventNames() {

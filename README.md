@@ -1,6 +1,6 @@
 # funcs-invoker
 
-WHY a event emitter need a event name ?!
+**WHY** a event emitter need a event name ?!
 
 ``` ts
 import { FuncsInvoker } from "event-invoker";
