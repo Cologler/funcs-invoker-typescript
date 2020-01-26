@@ -22,3 +22,15 @@ invoker.on((a, b) => {
 });
 invoker.invoke('a', 'b'); // return 'ret_2'
 ```
+
+## Installation
+
+``` cmd
+npm i funcs-invoker
+```
+
+or on browser:
+
+``` url
+https://cdn.jsdelivr.net/gh/Cologler/funcs-invoker-typescript/dist/funcs-invoker.browser.js
+```
