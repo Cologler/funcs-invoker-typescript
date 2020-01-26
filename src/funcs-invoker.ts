@@ -187,7 +187,7 @@ export class FuncsInvoker<T extends any[]> {
                     };
 
                     try {
-                        ret = entity.Func.apply(context, args.slice());
+                        ret = entity.Func.apply<InvokeContext, any, any>(context, args.slice());
                     } finally {
                         if (flags.off || entity.Once) {
                             needRemove = true

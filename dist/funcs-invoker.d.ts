@@ -92,14 +92,14 @@ export declare class FuncsInvoker<T extends any[]> {
      * @readonly
      * @memberof FuncsInvoker
      */
-    readonly isEmpty: boolean;
+    get isEmpty(): boolean;
     /**
      * get the count of functions.
      *
      * @readonly
      * @memberof FuncsInvoker
      */
-    readonly Count: number;
+    get Count(): number;
 }
 declare type EventKey = PropertyKey;
 /**
