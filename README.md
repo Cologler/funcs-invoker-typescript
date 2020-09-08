@@ -8,13 +8,13 @@
 import { FuncsInvoker } from "event-invoker";
 
 const invoker = new FuncsInvoker<[string, string]>();
-invoker.on((a, b) => {
+invoker.on(function(a, b) {
     // this is a InvokeContext object.
     // a === 'a'
     // b === 'b'
     return 'ret_1';
 });
-invoker.on((a, b) => {
+invoker.on(function(a, b) {
     // this is a InvokeContext object.
     // a === 'a'
     // b === 'b'
